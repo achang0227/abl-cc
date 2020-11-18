@@ -15,7 +15,14 @@ function App() {
   const [entry, setEntry] = useState({
     entry: {
       "im:name": {},
-      "im:image": [{}]
+      "im:image": [{}],
+      "im:itemCount": {},
+      "rights": {},
+      "im:artist": {},
+      "category": {
+        "attributes": {}
+      },
+      "im:price": {}
     }
   })
 
@@ -24,12 +31,32 @@ function App() {
   function AlbumDetail({entry}) {
     return (
       <div style={{backgroundColor:'lightblue', display:'flex', margin:'5px auto'}}>
-        <div style={{flexGrow:'1'}}>
+        <div>
           <img style={{width:160, margin:20}} src={entry['im:image'][2].label} />
         </div>
-        <div style={{flexGrow:'1'}}>
-          <p>{entry['im:name'].label}</p>
-          <button>Add to favorites.</button>
+        <div style={{flexGrow:1, flexDirection:'col'}}>
+          <div style={{display:'flex'}}>
+            <div style={{flexDirection:'row'}}>
+              <div style={{margin:'10px 5px'}}>
+                <p>Album Name:</p>
+                <p>Artist:</p>
+                <p>Category:</p>
+                <p>Number of songs:</p>
+                <p>Price:</p>
+              </div>
+            </div>
+            <div style={{flexGrow:1}}>
+              <p>{entry['im:name'].label}</p>
+              <p>{entry['im:artist'].label}</p>
+              <p>{entry.category.attributes.label}</p>
+              <p>{entry['im:itemCount'].label}</p>
+              <p>{entry['im:price'].label}</p>
+            </div>
+          </div>
+          <div style={{margin:'0px 0px 20px 0px'}}>
+            <p>{entry.rights.label}</p>
+            <button>Add to favorites.</button>
+          </div>
         </div>
         <div style={{margin:'5px 5px'}}>
           <button onClick={() => setAlbumInfo(false)}>CLOSE</button>
