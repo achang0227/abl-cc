@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import fetchTopAlbums from './top-albums'
 
+const LOCAL_STORAGE_KEY = 'data'
 
 function App() {
   const [data, setData] = useState({
@@ -27,14 +28,10 @@ function App() {
       "id": {
         "attributes": {}
       }
-    }
-  })
+    }})
   const [favorites, setFavorites] = useState([])
+  const [page, setPage] = useState('all')
   const newEntry = useRef()
-
-  const LOCAL_STORAGE_KEY = 'data'
-
-  console.log(favorites)
 
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
@@ -65,6 +62,10 @@ function App() {
     }
   }
 
+  function togglePage(page) {
+    return setPage(page)
+  }
+
   function AlbumDetail({entry}) {
     return (
       <div style={{backgroundColor:'lightblue', display:'flex', margin:'5px auto'}}>
@@ -92,8 +93,8 @@ function App() {
           </div>
           <div style={{margin:'0px 0px 20px 0px'}}>
             <p>{entry.rights.label}</p>
-            <button onClick={addEntry}>Add to favorites.</button>
-            <button onClick={removeEntry}>Remove from favorites.</button>
+            {favorites.indexOf(entry.id.attributes['im:id']) === -1 && <button onClick={addEntry}>Add to favorites.</button>}
+            {favorites.indexOf(entry.id.attributes['im:id']) !== -1 && <button onClick={removeEntry}>{String.fromCharCode(9733)}Remove from favorites.</button>}
           </div>
         </div>
         <div style={{margin:'5px 5px'}}>
@@ -105,36 +106,40 @@ function App() {
 
   return (
     <div>
-      <div>{String.fromCharCode(9733)}</div>
-
       <div style={{backgroundColor: "darkgrey", display:'flex'}}>
         <div>
           <h1 style={{fontFamily: 'Arial', fontSize: 20, fontWeight: 'bold', padding:'5px 0px 5px 5px', marginBottom:0}}>Top Albums</h1>
         </div>
 
-        <div style={{flexGrow:1}}>
+        <div onClick={() => togglePage('all')} style={{flexGrow:1}}>
           <p style={{position:'relative', float:'right', marginRight:15}}>Top Albums</p>
         </div>
 
-        <div style={{}}>
-          <p style={{marginRight:15}}> Favorite Albums</p>
+        <div onClick={() => togglePage('fav')} style={{}}>
+          <p style={{marginRight:15}}>Favorite Albums</p>
         </div>
       </div>
 
-      <div>
-
       {albumInfo && <AlbumDetail entry={entry}/>}
-
-      </div>
-
       <ul onClick={() => setAlbumInfo(true)} style={{display:'flex', flexWrap:'wrap'}}>
         {data.feed.entry.map(entry => (
-          <div key={entry.id.attributes['im:id']} ref={newEntry} onClick={(() => setEntry(entry))} style={{backgroundColor: "lightgrey", width:200, height: 275, margin:'15px 20px', display: 'flex', flexDirection:'column', alignItems:'center', borderRadius: 10}}>
-             <img style={{width:160, marginTop:20}} src={entry['im:image'][2].label} />
-             <p style={{fontFamily: 'Arial', fontSize: 13, fontWeight: 'bold', marginBottom:0}}>{entry['im:artist'].label}</p>
-             <p style={{textAlign:'center', fontFamily: 'Arial', fontSize: 13, margin:'5px 10px 0px 10px'}}>{entry['im:name'].label}</p>
+          (page === 'all') ?
+            <div key={entry.id.attributes['im:id']} ref={newEntry} onClick={(() => setEntry(entry))} style={{backgroundColor: "lightgrey", width:200, height: 275, margin:'15px 20px', display: 'flex', flexDirection:'column', alignItems:'center', borderRadius: 10}}>
+               <img style={{width:160, marginTop:20}} src={entry['im:image'][2].label} />
+               <p style={{fontFamily: 'Arial', fontSize: 13, fontWeight: 'bold', marginBottom:0}}>{entry['im:artist'].label}</p>
+               <p style={{textAlign:'center', fontFamily: 'Arial', fontSize: 13, margin:'5px 10px 0px 10px'}}>{entry['im:name'].label}</p>
+               {(favorites.indexOf(entry.id.attributes['im:id'])!== -1) ? <div>{String.fromCharCode(9733)}</div>:null}
             </div>
-        ))}
+            :(favorites.indexOf(entry.id.attributes['im:id'])!== -1) ?
+              <div key={entry.id.attributes['im:id']} ref={newEntry} onClick={(() => setEntry(entry))} style={{backgroundColor: "lightgrey", width:200, height: 275, margin:'15px 20px', display: 'flex', flexDirection:'column', alignItems:'center', borderRadius: 10}}>
+                 <img style={{width:160, marginTop:20}} src={entry['im:image'][2].label} />
+                 <p style={{fontFamily: 'Arial', fontSize: 13, fontWeight: 'bold', marginBottom:0}}>{entry['im:artist'].label}</p>
+                 <p style={{textAlign:'center', fontFamily: 'Arial', fontSize: 13, margin:'5px 10px 0px 10px'}}>{entry['im:name'].label}</p>
+                 {(favorites.indexOf(entry.id.attributes['im:id'])!== -1) ? <div>{String.fromCharCode(9733)}</div>:null}
+              </div>
+            :null
+          ))
+        }
       </ul>
     </div>
   )
